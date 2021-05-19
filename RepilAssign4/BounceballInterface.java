@@ -13,15 +13,16 @@
 //Program Name:Bouncing Balls
 //Programming Language: Java
 //Files: BallGraphics.java, BounceballInterface.java, Main.java, run.sh
-//Date Project began: 2021-Mar-17
-//Date of last update: 2021-Mar-28
+//Date Project began: 2021-Apr-17
+//Date of last update: 2021-May-10
 //Status: Work in Progress
 //Purpose: This program is meant to be the UI of the program.
-//This module
+//This module contains the interface for the user to input speeds for both cat and mouse and the direction of the mouse.
 //BallGraphics.java
 //Compile: javac BounceballInterface.java
 //This module called from the Main class
-// Purpose: To practice more with java graphics as well as having collisions
+// Purpose: Continuation of practicing with moving java graphics with not only straight lines
+// but also with curved lines that update to one's motion
 
 
 
@@ -50,12 +51,14 @@ import java.awt.FlowLayout;
 public class BounceballInterface extends JFrame {
   private final int length_of_delay = 1000;
   private final int widthUI = 1280;
-  private final int heightUI = 900;
+  private final int heightUI = 720;
   private int refreshDelay;
   private int motionDelay;
+  private int catMotionDelay;
   private Timer delayClosing;
   private Timer refreshClock;
   private Timer motionClock;
+  private Timer catMotionClock;
   private JButton clearButton;
   private JButton startButton;
   private JButton quitButton;
@@ -78,7 +81,9 @@ public class BounceballInterface extends JFrame {
   private double texttoSpeed;
   private double texttoDirection;
   private final double motion_clock_rate  = 100.0;
-  private final double refresh_clock_rate = 0;
+  private final double cat_motion_rate = 100.0;
+  private final double refresh_clock_rate = 120.50;
+  private double catClock;
   private JLabel ballLoc;
   private JLabel xLabel;
   private JLabel yLabel;
@@ -96,7 +101,7 @@ public class BounceballInterface extends JFrame {
   private Color CPanel1 = new Color(193,230,254);
   private Color CPanel2 = new Color(  0,100,165);
   private Color CPanel3 = new Color(155, 70,200);
-  private Color CPanel4 = new Color(76,166,241);
+  private Color CPanel4 = new Color(230,126, 34);
   private BallGraphics ball;
   private boolean on = false;
   private boolean show = false;
@@ -113,9 +118,9 @@ public class BounceballInterface extends JFrame {
 
   public BounceballInterface()
   {
-    super("Program 3");
+    super("Program 4");
     setLayout(new BorderLayout());
-    setTitle("Bouncing Balls");
+    setTitle("Cat and Mouse");
     setSize(widthUI, heightUI);
     setLocationRelativeTo(null);
     //top panel
@@ -123,7 +128,7 @@ public class BounceballInterface extends JFrame {
     Top.setBackground(CPanel1);
     Top.setSize(topWidth, topHeight);
     add(Top, BorderLayout.NORTH);
-    assignment = new JLabel("CPSC 233J Assignment 3");
+    assignment = new JLabel("CPSC 233J Assignment 4");
     name = new JLabel("By Emmanuel Salcedo");
     Top.add(assignment);
     Top.add(name);
@@ -156,7 +161,7 @@ public class BounceballInterface extends JFrame {
     ButtonA.add(clearButton);
     ButtonA.add(quitButton);
 
-    refRate = new JLabel("Refresh Rate Hz");
+    refRate = new JLabel("Cat Speed");
     speedLabel = new JLabel("Speed (pix/sec)");
     dirLabel = new JLabel("Direction");
     refreshRateText = new JTextField();
@@ -170,15 +175,15 @@ public class BounceballInterface extends JFrame {
     ButtonA.add(direction);
 
     ballLoc = new JLabel("Ball's Location");
-    xLabel = new JLabel("X: ");
-    yLabel = new JLabel("Y: ");
+    xLabel = new JLabel("Distance Between: ");
+    //yLabel = new JLabel("Y: ");
     xText = new JTextField("000.00");
-    yText = new JTextField("000.00");
+    //yText = new JTextField("000.00");
     ButtonB.add(ballLoc);
     ButtonB.add(xLabel);
     ButtonB.add(xText);
-    ButtonB.add(yLabel);
-    ButtonB.add(yText);
+    //ButtonB.add(yLabel);
+    //ButtonB.add(yText);
     //buttonhandler
     buttonhandler myhandler = new buttonhandler();
     clearButton.addActionListener(myhandler);
@@ -187,7 +192,18 @@ public class BounceballInterface extends JFrame {
 
     //clockhandler
     myclock = new Clockhandler();
-    ball.BallMovement(0,0);
+    ball.BallMovement(0,0,0);
+    //clocks
+    refreshDelay = (int)Math.round(length_of_delay/refresh_clock_rate);
+    refreshClock = new Timer(refreshDelay, myclock);
+
+    motionDelay = (int)Math.round(length_of_delay/motion_clock_rate);
+    motionClock = new Timer(motionDelay, myclock);
+
+    catMotionDelay = (int)Math.round(length_of_delay/cat_motion_rate);
+    catMotionClock = new Timer(motionDelay, myclock);
+
+
 
 
 
@@ -206,19 +222,37 @@ public class BounceballInterface extends JFrame {
       else if(event.getSource() == motionClock)
       {
         animationContinue = ball.moveBall();
-        xCoord = ball.CenterXofBall();
-        yCoord = ball.CenterYofBall();
+        xCoord = ball.getDistance();
+        //yCoord = ball.CenterYofBall();
         xText.setText(String.format("%.2f", xCoord));
-        yText.setText(String.format("%.2f",yCoord));
+        //yText.setText(String.format("%.2f",yCoord));
         if(!animationContinue)
         {
           motionClock.stop();
           refreshClock.stop();
+          catMotionClock.stop();
           startButton.setEnabled(true);
 
         }
       }
+      else if(event.getSource() == catMotionClock)
+      {
+        animationContinue = ball.moveCat();
+        xCoord = ball.CenterXofCat();
+        yCoord = ball.CenterYofCat();
+
+        if(!animationContinue)
+        {
+          motionClock.stop();
+          catMotionClock.stop();
+          refreshClock.stop();
+          startButton.setText("Start");
+          startButton.setEnabled(true);
+        }
+      }
     }
+
+
   }
 
   private class buttonhandler implements ActionListener
@@ -229,20 +263,13 @@ public class BounceballInterface extends JFrame {
         {
           if(state == 1)
           {
-            texttoRefresh = Double.parseDouble(refreshRateText.getText());
-            refreshDelay = (int)Math.round(length_of_delay/texttoRefresh);
-            refreshClock = new Timer(refreshDelay, myclock);
-
-            motionDelay = (int)Math.round(length_of_delay/motion_clock_rate);
-            motionClock = new Timer(motionDelay, myclock);
             state++;
-            show = true;
-            ball.showing(show);
           }
           if(on)
           {
             refreshClock.stop();
             motionClock.stop();
+            catMotionClock.stop();
             startButton.setText("Resume");
             on = false;
           }
@@ -250,6 +277,7 @@ public class BounceballInterface extends JFrame {
           {
             refreshClock.start();
             motionClock.start();
+            catMotionClock.start();
             startButton.setText("Pause");
             on = true;
           }
@@ -260,10 +288,13 @@ public class BounceballInterface extends JFrame {
 
             texttoSpeed = Double.parseDouble(speed.getText());
             texttoDirection = Double.parseDouble(direction.getText());
+            texttoSpeed = texttoSpeed/motion_clock_rate;
             double angle = Math.toRadians(texttoDirection);
             deltaX = Math.cos(angle) * texttoSpeed;
             deltaY = Math.sin(angle) * texttoSpeed;
-            ball.BallMovement(deltaX, deltaY);
+            catClock = Double.parseDouble(refreshRateText.getText());
+            catClock = catClock/motion_clock_rate;
+            ball.BallMovement(deltaX, deltaY, catClock);
             state = 0;
           }
         }
@@ -277,11 +308,12 @@ public class BounceballInterface extends JFrame {
           refreshRateText.setText(null);
           startButton.setText("Start");
           xText.setText("000.00");
-          yText.setText("000.00");
-          ball.BallMovement(deltaX, deltaY);
-          ball.showing(show);
+          //yText.setText("000.00");
+          ball.BallMovement(deltaX, deltaY, catClock);
+
           state = 1;
           ball.repaint();
+          startButton.setEnabled(true);
         }
 
 

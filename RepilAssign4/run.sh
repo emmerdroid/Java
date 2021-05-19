@@ -1,4 +1,4 @@
-#Program name: Bouncing Balls
+#Program name: Cat and Mouse
 #Author: Emmanuel Salcedo
 #email: emsalcedo@csu.fullerton.edu
 #file name: run.sh

@@ -10,18 +10,19 @@
 //Mail: emsalcedo@csu.fullerton.edu
 
 //Program Information
-//Program Name:Bouncing Balls
+//Program Name:Cat and Mouse
 //Programming Language: Java
 //Files: BallGraphics.java, BounceballInterface.java, Main.java, run.sh
-//Date Project began: 2021-Mar-17
-//Date of last update: 2021-Mar-28
+//Date Project began: 2021-April-17
+//Date of last update: 2021-May-10
 //Status: Work in Progress
-//Purpose: This program is meant to simulate a bouncing ball
-//This module
+//Purpose: This program is meant to simulate a cat chasing a mouse using motion curves.
+//This module will initilize everything on start the main program that has the interface.
 //Main.java
 //Compile: javac Main.java
 //This module is the top level class that activates the UI
-// Purpose: To practice more with java graphics as well as having collisions
+// Purpose: To practice more with java graphics as well as having collisions and an object with a constantly
+//updated movement
 
 
 import java.awt.*;
@@ -44,7 +45,7 @@ public class Main
   {
     BounceballInterface myframe = new BounceballInterface();
     myframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    myframe.setSize(1280, 900);
+    myframe.setSize(1280, 720);
     myframe.setVisible(true);
   }
 

@@ -22,6 +22,7 @@ public class Main
         myframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         myframe.setSize(1280, 720);
         myframe.setVisible(true);
+        myframe.setResizable(false);
 
     }
     

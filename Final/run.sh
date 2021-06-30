@@ -1,3 +1,6 @@
+//Emmanuel Salcedo
+//Java Final
+
 echo remove old byte-code files if any exist
 rm *.class
 echo view list of source files

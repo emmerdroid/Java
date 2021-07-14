@@ -48,11 +48,13 @@ public class Board extends JPanel implements ActionListener{
     }
     
     private void initBoard() {
+        //creates listener for key presses
 
         addKeyListener(new TAdapter());
+        //makes color of game screen
         setBackground(Color.black);
         setFocusable(true);
-
+        //makes boars size
         setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT));
         loadImages();
         initGame();
@@ -60,10 +62,11 @@ public class Board extends JPanel implements ActionListener{
 
     private void loadImages() {
 
-        ImageIcon iid = new ImageIcon("Dot.png");
+        ImageIcon iid = new ImageIcon("Dot.png"); //accesses images
         Image buffer = iid.getImage();
         Image newBuffer = buffer.getScaledInstance(10, 10, java.awt.Image.SCALE_SMOOTH);
         iid = new ImageIcon(newBuffer);
+        //resizes the image to dot size
         ball = iid.getImage();
 
         ImageIcon iia = new ImageIcon("Apple.png");
